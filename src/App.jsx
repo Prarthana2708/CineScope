@@ -6,7 +6,7 @@ import Search from './components/Search.jsx'
 import Spinner from './components/Spinner.jsx'
 import MovieCard from './components/MovieCard.jsx'
 import { useDebounce } from 'react-use'
-// // import { getTrendingMovies, updateSearchCount } from './appwrite.js'
+import { getTrendingMovies, updateSearchCount } from './appwrite.js'
 
 const API_BASE_URL = 'https://api.themoviedb.org/3';
 
@@ -39,9 +39,7 @@ const App = () => {
     setErrorMessage('');
 
     try {
-      // const endpoint = query
-      //   ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
-      //   : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
+      
       const endpoint = query
       ? `${API_BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`
       : `${API_BASE_URL}/discover/movie?api_key=${API_KEY}&sort_by=popularity.desc`;
@@ -57,11 +55,11 @@ const App = () => {
 
       const data = await response.json();
 
-      // if(data.Response === 'False') {
-      //   setErrorMessage(data.Error || 'Failed to fetch movies');
-      //   setMovieList([]);
-      //   return;
-      // }
+      if(data.Response === 'False') {
+        setErrorMessage(data.Error || 'Failed to fetch movies');
+        setMovieList([]);
+        return;
+      }
       if (!data.results || data.results.length === 0) {
         setErrorMessage('No movies found.');
         setMovieList([]);
@@ -82,22 +80,22 @@ const App = () => {
     }
   };
 
-  // const loadTrendingMovies = async () => {
-  //   try {
-  //     const movies = await getTrendingMovies();
-  //     setTrendingMovies(movies);
-  //   } catch (error) {
-  //     console.error(`Error fetching trending movies: ${error}`);
-  //   }
-  // }
+  const loadTrendingMovies = async () => {
+    try {
+      const movies = await getTrendingMovies();
+      setTrendingMovies(movies);
+    } catch (error) {
+      console.error(`Error fetching trending movies: ${error}`);
+    }
+  }
 
   useEffect(() => {
     fetchMovies(debouncedSearchTerm);
   }, [debouncedSearchTerm]);
 
-  // useEffect(() => {
-  //   loadTrendingMovies();
-  // }, []);
+  useEffect(() => {
+    loadTrendingMovies();
+  }, []);
 
   return (
     <main>
@@ -137,7 +135,7 @@ const App = () => {
             <p className="text-red-500">{errorMessage}</p>
           ) : (
             <ul>
-              {/* Mock data for UI testing */}
+              
               <MovieCard key="1" movie={{ id: "1", title: "Sample Movie", poster_path: "https://dummyimage.com/100x150/000/fff" }} />
             </ul>
           )}  
